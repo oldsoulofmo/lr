@@ -25,3 +25,44 @@ test_set_x_orig_flatten = test_set_x_orig.reshape(
 # normalization, this is one way .. there is another
 train_x = training_set_x_orig_flatten / 255
 test_x = test_set_x_orig_flatten / 255
+
+print(train_x.shape[0])
+
+
+def sigmoid(z):
+    f = 1 / (1+np.exp(-z))
+    return f
+
+
+def init_params(dim):
+
+    w = np.zeros((dim, 1))
+    b = .0
+
+    return w, b
+
+
+def propagation(w, b, X, Y):
+
+    # n - examples
+    m = X.shape[1]
+
+   # forward propagation
+    A = sigmoid(np.dot(w.T, X) + b)
+    cost = -(np.dot(Y, np.log(A).T) + np.dot(1-Y, np.log(1-A).T))
+
+    # backward propagation
+    dw = 1/m * np.dot(X, (A-Y).T)
+    db = 1/m * np.sum((A-Y))
+
+    cost = np.squeeze(cost)  # to ensure cost is a np array
+
+    gradients = {"dw": dw,
+                 "db": db}
+
+    return gradients, cost
+
+
+def model(n_x):
+    n_x = train_x.shape[0]
+    print(n_x)
