@@ -1,3 +1,4 @@
+import copy
 import numpy as np
 import h5py
 import matplotlib.pyplot as plt
@@ -49,7 +50,7 @@ def propagation(w, b, X, Y):
 
    # forward propagation
     A = sigmoid(np.dot(w.T, X) + b)
-    cost = -(np.dot(Y, np.log(A).T) + np.dot(1-Y, np.log(1-A).T))
+    cost = -1/m * (np.dot(Y, np.log(A).T) + np.dot(1-Y, np.log(1-A).T))
 
     # backward propagation
     dw = 1/m * np.dot(X, (A-Y).T)
@@ -63,6 +64,65 @@ def propagation(w, b, X, Y):
     return gradients, cost
 
 
-def model(n_x):
-    n_x = train_x.shape[0]
-    print(n_x)
+def optimize(w, b, X, Y, learning_rate=0.009, num_iterations=100, print_cost=False):
+
+    costs = []
+    for i in range(num_iterations):
+        gradients, cost = propagation(w, b, X, Y)
+        w = w - learning_rate*gradients["dw"]
+        b = b - learning_rate*gradients["db"]
+
+        if print_cost:
+            if i % 100 == 0:
+                costs.append(cost)
+                print(
+                    f"Iteration : {i} \tCost : {cost}")
+
+    params = {"w": w, "b": b}
+    grads = {"dw": gradients["dw"], "db": gradients["db"]}
+
+    return params, grads, costs
+
+
+def predict(w, b, X):
+    m = X.shape[1]
+    predictions = np.zeros((1, m))
+    w = w.reshape(X.shape[0], 1)
+
+    A = sigmoid(np.dot(w.T, X)) + b
+
+    for i in range(A.shape[1]):
+        if (A[0, i] > 0.5):
+            predictions[0, i] = 1
+        else:
+            predictions[0, i] = 0
+
+    return predictions
+
+
+def model(X_train, Y_train, X_test, Y_test, num_its=2000, learning_rate=0.5, print_cost=False):
+    w, b = init_params(X_train.shape[0])
+    params, grads, costs = optimize(
+        w, b, X_train, Y_train, learning_rate=learning_rate, num_iterations=num_its, print_cost=print_cost)
+
+    w = params["w"]
+    b = params["b"]
+
+    predictions_train_set = predict(w, b, X_train)
+    predictions_test_set = predict(w, b, X_test)
+
+    info = {
+        "costs": costs,
+        "prediction on training set": predictions_train_set,
+        "prediction on test set": predictions_test_set,
+        "w": w,
+        "b": b,
+        "alpha": learning_rate,
+        "n. iterations": num_its
+    }
+
+    return info
+
+
+lr_model = model(train_x, training_set_y, test_x,
+                 test_set_y, 2000, 0.005, True)
