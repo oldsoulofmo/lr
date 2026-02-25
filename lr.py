@@ -126,3 +126,12 @@ def model(X_train, Y_train, X_test, Y_test, num_its=2000, learning_rate=0.5, pri
 
 lr_model = model(train_x, training_set_y, test_x,
                  test_set_y, 2000, 0.005, True)
+
+
+# making sure costs is a np array
+costs = np.squeeze(lr_model["costs"])
+plt.title(f"learning rate : {lr_model["alpha"]}")
+plt.plot(costs)
+plt.xlabel("iterations")
+plt.ylabel("cost")
+plt.show()
