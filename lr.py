@@ -89,7 +89,7 @@ def predict(w, b, X):
     predictions = np.zeros((1, m))
     w = w.reshape(X.shape[0], 1)
 
-    A = sigmoid(np.dot(w.T, X)) + b
+    A = sigmoid(np.dot(w.T, X) + b)
 
     for i in range(A.shape[1]):
         if (A[0, i] > 0.5):
